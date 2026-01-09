@@ -68,7 +68,7 @@ uint8_t i2c_master_open_raw(uint8_t adr){
 void i2c_master_init(uint8_t pullups, uint8_t prescaler){
 	
 	
-	if (prescaler < 11) // prescalrer must be bigger than 10, see datasheet
+	if (prescaler < 11) 
 		prescaler = 11;
 	
 	// TWI Ports
@@ -151,7 +151,6 @@ uint8_t i2c_master_read_next(void){
 uint8_t i2c_master_read_last(void){
 	
 	// Enable reciving
-	// TODO
 	TWCR = (1<<TWEN)|(1<<TWINT);
 		
 	// wait for complete byte
@@ -170,7 +169,6 @@ uint8_t i2c_master_read_last(void){
 void i2c_master_close(){
 	
     // send stop 
-	// TODO
 	TWCR = (1<<TWEN)|(1<<TWINT)|(1<<TWSTO);
 	// wait until this is done
 	while( TWCR & (1 << TWSTO) )
@@ -178,5 +176,6 @@ void i2c_master_close(){
 
 }
 /******************************************************************************/
+
 
 
