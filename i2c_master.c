@@ -1,7 +1,6 @@
 
 /**
 	@author Meet Hemant Ghodke
-	@author TODO
 	@version 0.1
 	@file i2c_master.c
 	@brief Use the Two Wire Interface / I2C
@@ -176,6 +175,7 @@ void i2c_master_close(){
 
 }
 /******************************************************************************/
+
 
 
 
