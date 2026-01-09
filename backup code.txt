@@ -1,0 +1,193 @@
+/**
+	@author Meet Hemant Ghodke
+	@version 0.1
+	@file main.c
+	@brief Software for experiment Simple Calculator
+*/
+
+/**
+	@brief The CPU speed in Hz
+*/
+#define F_CPU 8000000UL 
+/******************************************************************************/
+/* INCLUDED FILES                                                             */
+/******************************************************************************/
+#include <avr/io.h>
+#include <stdio.h>
+#include <util/delay.h>
+#include "lcd.h"
+#include "init.h"
+/******************************************************************************/
+void display(uint16_t value_1 , uint16_t value_2)
+{
+	lcd_clear();
+	char line[16];
+	sprintf(line, "+: %d  -: %d",value_1 + value_2 , value_1 - value_2);
+	lcd_setcursor(0,1);
+	lcd_string(line);
+	if(value_2 > 0)
+	{
+		snprintf(line,16, "*: %d /: %2d",value_1*value_2 , value_1/value_2);
+		lcd_setcursor(0,2);
+		lcd_string(line);
+	}
+	else
+	{
+		snprintf(line,16, "*: 0 /: inf");
+		lcd_setcursor(0,2);
+		lcd_string(line);
+    }
+}
+int main(void)
+{
+	uint16_t value_1 , value_2;
+	char line[16];
+	ADMUX = (1<<REFS0); //PC0 as potentiometers
+	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1);   //Enable the ADC with 64 prescaler division factor
+	lcd_init();
+	for(;;)
+	{
+		if(~PINB&(1<<PB0))
+		{
+		ADMUX &= ~(1<<MUX1)|(1<<MUX0);
+		ADCSRA |= (1<<ADSC);
+		while(ADCSRA &(1<<ADSC));
+		value_1 = ADCW;
+		}
+		if(~PINB&(1<<PB1))
+		{
+		ADMUX |= (1<<MUX0);
+		ADCSRA |= (1<<ADSC);
+		while(ADCSRA &(1<<ADSC));
+		value_2 = ADCW;
+		}
+		ADMUX &= ~(1<<MUX0);
+		lcd_clear();
+		lcd_setcursor(0,1);
+		sprintf(line,"Value 1: %d",value_1);
+		lcd_string(line);
+		lcd_setcursor(0,2);
+		sprintf(line,"Value 2: %d",value_2);
+		lcd_string(line);
+		_delay_ms(150);
+		if(~PINB&(1<<PB0)&& ~PINB&(1<<PB1))
+			{
+				_delay_ms(75);
+				lcd_clear();
+				display(value_1 , value_2);
+			}
+	}
+	return 0;
+}
+
+
+++++++
+/**
+	@author Meet Hemant Ghodke
+	@version 0.1
+	@file main.c
+	@brief Software for experiment Simple Calculator
+*/
+
+/**
+	@brief The CPU speed in Hz
+*/
+#define F_CPU 8000000UL 
+/******************************************************************************/
+/* INCLUDED FILES                                                             */
+/******************************************************************************/
+#include <avr/io.h>
+#include <stdio.h>
+#include <util/delay.h>
+#include "lcd.h"
+#include "init.h"
+/******************************************************************************/
+int main(void)
+{
+	uint16_t value_1 = 0, value_2 = 0;
+        uint16_t sum = 0 , product = 1 , difference = 0;
+        uint16_t sqr1 = 0, sqr2 = 0;
+	char line[16];
+	DDRB &= ~(1<<DDB0);
+	DDRB &= ~(1<<DDB1);
+	PORTB |= (1<<PB0);
+    PORTB |= (1<<PB1);
+	ADMUX = (1<<REFS0); //PC0 as potentiometers
+	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1);   //Enable the ADC with 64 prescaler division factor
+	lcd_init();
+	for(;;)
+	{
+		if(~PINB&(1<<PB0))
+		{
+		ADMUX &= ~(1<<MUX1)|(1<<MUX0);
+		ADCSRA |= (1<<ADSC);
+		while(ADCSRA &(1<<ADSC));
+		value_1 = ADCW;
+		lcd_clear();
+		lcd_setcursor(0,1);
+		sprintf(line,"Value 1: %5u",value_1);
+		lcd_string(line);
+		}
+		if(~PINB&(1<<PB1))
+		{
+		ADMUX |= (1<<MUX0);
+		ADCSRA |= (1<<ADSC);
+		while(ADCSRA &(1<<ADSC));
+		value_2 = ADCW;
+		lcd_setcursor(0,2);
+		sprintf(line,"Value 2: %5u",value_2);
+		lcd_string(line);
+		}
+		ADMUX &= ~(1<<MUX0);
+		_delay_ms(150);
+		if(~PINB&(1<<PB0) && ~PINB&(1<<PB1))
+			{
+                                sum = value_1 + value_2;
+                                difference = value_1 - value_2;
+                                product = value_1*value_2;
+				sqr1 = value_1*value_1;
+				sqr2 = value_2*value_2;
+				_delay_ms(75);
+				lcd_clear();
+				sprintf(line, "+:%5u -:%5u",sum , difference);
+	            lcd_setcursor(0,1);
+	            lcd_string(line);
+	            if(value_2 > 0)
+	            {
+				sprintf(line, "*: %5u /: %d.%d", product , value_1/value_2 , ((value_1%value_2)*10)/value_2);
+				lcd_setcursor(0,2);
+				lcd_string(line);
+				}
+				else
+				{
+				snprintf(line,16, "*: 0 /: \xF3");
+				lcd_setcursor(0,2);
+				lcd_string(line);
+				}
+					_delay_ms(10000);
+					lcd_clear();
+				sprintf(line, "SQR1: %5u",sqr1);
+	            lcd_setcursor(0,1);
+	            lcd_string(line);
+				sprintf(line, "SQR2: %5u",sqr2);
+	            lcd_setcursor(0,2);
+	            lcd_string(line);
+				     _delay_ms(10000);
+				lcd_clear();
+				sprintf(line, "No.1 HEX: %x",value_1);
+	            lcd_setcursor(0,1);
+	            lcd_string(line);
+				sprintf(line, "No.2 HEX: %x",value_2);
+	            lcd_setcursor(0,2);
+	            lcd_string(line);
+					
+			}
+	}
+	return 0;
+}
+		
+		
+	
+	
+		
+	
