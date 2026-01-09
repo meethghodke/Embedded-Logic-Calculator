@@ -1,7 +1,3 @@
-// control a HD44780 compatible LCD in 4-Bit-Interfacemode
-
-
- 
 #include <avr/io.h>
 #include "lcd.h"
 #include <util/delay.h>
@@ -10,19 +6,19 @@
 // Generate a Enable-Puls
 static void lcd_enable( void )
 {
-    LCD_PORT |= (1<<LCD_EN);     // Enable auf 1 setzen
-    _delay_us( LCD_ENABLE_US );  // kurze Pause
-    LCD_PORT &= ~(1<<LCD_EN);    // Enable auf 0 setzen
+    LCD_PORT |= (1<<LCD_EN);     
+    _delay_us( LCD_ENABLE_US );  
+    LCD_PORT &= ~(1<<LCD_EN);    
 }
  
 ////////////////////////////////////////////////////////////////////////////////
 // Send 4-bit output operation to LCD
 static void lcd_out( uint8_t data )
 {
-    data &= 0xF0;                       // mask highnibble
+    data &= 0xF0;                       
  
-    LCD_PORT &= ~(0xF0>>(4-LCD_DB));    // delete mask
-    LCD_PORT |= (data>>(4-LCD_DB));     // set Bits 
+    LCD_PORT &= ~(0xF0>>(4-LCD_DB));    
+    LCD_PORT |= (data>>(4-LCD_DB));      
     lcd_enable();
 }
  
@@ -31,9 +27,9 @@ static void lcd_out( uint8_t data )
 void lcd_init( void )
 {
     // switch used Pins to output mode
-    uint8_t pins = (0x0F << LCD_DB) |           // 4 Datalines
-                   (1<<LCD_RS) |                // R/S Line
-                   (1<<LCD_EN);                 // Enable line
+    uint8_t pins = (0x0F << LCD_DB) |           
+                   (1<<LCD_RS) |                
+                   (1<<LCD_EN);                 
     LCD_DDR |= pins;
  
     // all outputs to zero
@@ -172,4 +168,5 @@ void lcd_generatechar( uint8_t code, const uint8_t *data )
     {
         lcd_data( data[i] );
     }
+
 }
